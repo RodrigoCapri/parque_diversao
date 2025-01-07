@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,7 +41,7 @@ public class Funcionario implements Serializable{
     private String telefone;
     private String senha;
 
-    @OneToMany(mappedBy = "id.funcionario")
+    @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<NotaFiscalServico> notasFiscais = new HashSet<>();
 
     public Funcionario(Long id, String nome, String cpf, String email, String telefone, String senha) {
