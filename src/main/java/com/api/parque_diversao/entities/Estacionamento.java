@@ -1,28 +1,28 @@
 package com.api.parque_diversao.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.api.parque_diversao.services.exceptions.VagaEstacionamentoException;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
+
 @Entity
 @Table(name = "tb_estacionamento")
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
@@ -36,14 +36,34 @@ public class Estacionamento implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String placaVeiculo;
+    private String endereco;
+    private Integer vagasTotal;
+    private Integer vagasDisponiveis;
 
-    @JsonFormat( shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
-    private Instant entrada;
+    @OneToMany(mappedBy = "estacionamento")
+    private Set<VagaEstacionamento> vagas_estacionamento;
+
+    public Estacionamento(Long id, String endereco, Integer vagasTotal) {
+        this.id = id;
+        this.endereco = endereco;
+        this.vagasTotal = vagasTotal;
+        this.vagasDisponiveis = this.vagasTotal;
+    }
+
+    public void preencherUmaVaga(){
+
+        if(vagasDisponiveis == 0)
+            throw new VagaEstacionamentoException("Não há vaga disponível!");
+
+        this.vagasDisponiveis--;
+    }
+
+    public void esvaziarUmaVaga(){
+
+        if(this.vagasDisponiveis >= this.vagasTotal)
+            throw new VagaEstacionamentoException("Não há vagas preenchidas!");
+
+        this.vagasDisponiveis++;
+    }
     
-    @JsonFormat( shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
-    private Instant saida;
-
-    private BigDecimal tarifa;
-	
 }
